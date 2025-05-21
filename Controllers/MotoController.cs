@@ -10,6 +10,8 @@ using System.Net;
 using System.Threading.Tasks;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
 using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+using CP2_BackEndMottu_DotNet.Infrastructure.Context;
 
 namespace CP2_BackEndMottu_DotNet.Controllers
 {
@@ -20,12 +22,13 @@ namespace CP2_BackEndMottu_DotNet.Controllers
         private readonly IRepository<Moto> _repository;
         private readonly MotoUseCase _useCase;
         private readonly CreateMotoRequestValidator _validator;
-
-        public MotoController(IRepository<Moto> repository, MotoUseCase useCase, CreateMotoRequestValidator validator)
+        private readonly MotoContext _context;
+        public MotoController(IRepository<Moto> repository, MotoUseCase useCase, CreateMotoRequestValidator validator,MotoContext context)
         {
             _repository = repository;
             _useCase = useCase;
             _validator = validator;
+            _context = context;
         }
 
         /// <summary>
@@ -75,7 +78,7 @@ namespace CP2_BackEndMottu_DotNet.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> PutMoto(Guid id, Moto moto)
+        public async Task<IActionResult> PutMoto(Guid id, UpdateMotoRequest moto)
         {
             if (id != moto.Id)
                 return BadRequest("Id inválido.");
@@ -83,15 +86,18 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
                 return NotFound();
+            existing.AtualizarDados(moto.Placa, moto.Modelo, moto.Status);
 
-            _repository.Update(moto);
+            _repository.Update(existing);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
 
-        /// <summary>
-        /// Exclui uma moto pelo ID.
-        /// </summary>
-        [HttpDelete("{id}")]
+            /// <summary>
+            /// Exclui uma moto pelo ID.
+            /// </summary>
+            [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> DeleteMoto(Guid id)

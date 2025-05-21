@@ -8,36 +8,38 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories
         protected readonly DbContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public Repository(MotoContext entity)
+        public Repository(MotoContext context)
         {
-
-            _context = entity;
+            _context = context;
             _dbSet = _context.Set<T>();
         }
 
-        public Task AddAsync(T entity)
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbSet.ToListAsync();
         }
 
-        public void Delete(T entity)
+        public async Task<T> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _dbSet.FindAsync(id);
         }
 
-        public Task<IEnumerable<T>> GetAllAsync()
+        public async Task AddAsync(T entity)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> GetByIdAsync(Guid Id)
-        {
-            throw new NotImplementedException();
+            await _dbSet.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
         public void Update(T entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Update(entity);
+            _context.SaveChanges();
+        }
+
+        public void Delete(T entity)
+        {
+            _dbSet.Remove(entity);
+            _context.SaveChanges();
         }
     }
 }

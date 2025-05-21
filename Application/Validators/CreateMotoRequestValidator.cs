@@ -17,8 +17,7 @@ namespace CP2_BackEndMottu_DotNet.Application.Validators
 
             RuleFor(x => x.Status)
                 .NotEmpty().WithMessage("Status é obrigatório.")
-                .Must(s => s == "Ativo" || s == "Inativo")
-                .WithMessage("Status deve ser 'Ativo' ou 'Inativo'.");
+               ;
         }
     }
 }

@@ -25,8 +25,7 @@ public class Moto
         if (string.IsNullOrWhiteSpace(modelo))
             throw new ArgumentException("Modelo obrigatório");
 
-        if (!new[] { "Ativa", "Inativa", "Manutencao" }.Contains(status))
-            throw new ArgumentException("Status inválido");
+        
 
         Placa = placa;
         Modelo = modelo;
