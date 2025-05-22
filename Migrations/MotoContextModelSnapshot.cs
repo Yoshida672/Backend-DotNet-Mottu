@@ -22,6 +22,27 @@ namespace CP2_BackEndMottu_DotNet.Migrations
 
             OracleModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CP2_BackEndMottu_DotNet.Domain.Entity.Condicao", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("RAW(16)");
+
+                    b.Property<string>("Cor")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("NVARCHAR2(200)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("NVARCHAR2(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Condicao", (string)null);
+                });
+
             modelBuilder.Entity("CP2_BackEndMottu_DotNet.Domain.Entity.LocalizacaoUWB", b =>
                 {
                     b.Property<Guid>("Id")
@@ -58,6 +79,9 @@ namespace CP2_BackEndMottu_DotNet.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("RAW(16)");
 
+                    b.Property<Guid>("CondicaoId")
+                        .HasColumnType("RAW(16)");
+
                     b.Property<string>("Modelo")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -75,6 +99,8 @@ namespace CP2_BackEndMottu_DotNet.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CondicaoId");
+
                     b.ToTable("Moto", (string)null);
                 });
 
@@ -87,6 +113,17 @@ namespace CP2_BackEndMottu_DotNet.Migrations
                         .IsRequired();
 
                     b.Navigation("Moto");
+                });
+
+            modelBuilder.Entity("CP2_BackEndMottu_DotNet.Domain.Entity.Moto", b =>
+                {
+                    b.HasOne("CP2_BackEndMottu_DotNet.Domain.Entity.Condicao", "Condicao")
+                        .WithMany()
+                        .HasForeignKey("CondicaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Condicao");
                 });
 
             modelBuilder.Entity("CP2_BackEndMottu_DotNet.Domain.Entity.Moto", b =>

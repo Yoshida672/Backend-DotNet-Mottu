@@ -1,0 +1,8 @@
+﻿namespace CP2_BackEndMottu_DotNet.Application.DTOs.Request
+{
+    public class CreateCondicaoRequest
+    {
+        public string Nome { get; set; }
+        public string Cor { get; set; }
+    }
+}

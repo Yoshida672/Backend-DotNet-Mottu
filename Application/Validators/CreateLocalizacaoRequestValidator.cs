@@ -8,11 +8,10 @@ namespace CP2_BackEndMottu_DotNet.Application.Validators
         public CreateLocalizacaoRequestValidator()
         {
             RuleFor(x => x.CoordenadaX)
-                .GreaterThanOrEqualTo(0).WithMessage("Coordenada X deve ser positiva.");
+               .NotNull().WithMessage("Coordenada X é obrigatória.");
 
             RuleFor(x => x.CoordenadaY)
-                .GreaterThanOrEqualTo(0).WithMessage("Coordenada Y deve ser positiva.");
-
+                .NotNull().WithMessage("Coordenada Y é obrigatória.");
             RuleFor(x => x.MotoId)
                 .NotEmpty().WithMessage("O ID da moto é obrigatório.");
         }

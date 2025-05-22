@@ -10,7 +10,6 @@ using System.Net;
 using System.Threading.Tasks;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
 using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
-using Microsoft.EntityFrameworkCore;
 using CP2_BackEndMottu_DotNet.Infrastructure.Context;
 
 namespace CP2_BackEndMottu_DotNet.Controllers
@@ -23,7 +22,8 @@ namespace CP2_BackEndMottu_DotNet.Controllers
         private readonly MotoUseCase _useCase;
         private readonly CreateMotoRequestValidator _validator;
         private readonly MotoContext _context;
-        public MotoController(IRepository<Moto> repository, MotoUseCase useCase, CreateMotoRequestValidator validator,MotoContext context)
+
+        public MotoController(IRepository<Moto> repository, MotoUseCase useCase, CreateMotoRequestValidator validator, MotoContext context)
         {
             _repository = repository;
             _useCase = useCase;
@@ -31,9 +31,6 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             _context = context;
         }
 
-        /// <summary>
-        /// Lista todas as motos cadastradas.
-        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<MotoResponse>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<MotoResponse>>> GetMotos()
@@ -42,9 +39,6 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             return Ok(motos);
         }
 
-        /// <summary>
-        /// Retorna uma moto específica pelo ID.
-        /// </summary>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(MotoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -57,9 +51,6 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             return Ok(moto);
         }
 
-        /// <summary>
-        /// Cria uma nova moto.
-        /// </summary>
         [HttpPost]
         [ProducesResponseType(typeof(MotoResponse), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -71,9 +62,6 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             return CreatedAtAction(nameof(GetMoto), new { id = moto.Id }, moto);
         }
 
-        /// <summary>
-        /// Atualiza uma moto existente.
-        /// </summary>
         [HttpPut("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -86,7 +74,16 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
                 return NotFound();
-            existing.AtualizarDados(moto.Placa, moto.Modelo, moto.Status);
+
+            var condicao = await _context.Condicoes.FindAsync(moto.CondicaoId);
+            if (condicao == null)
+                return BadRequest("Condição inválida.");
+
+            var modeloValido = Enum.TryParse<Modelo>(moto.Modelo, out var modeloParsed);
+            if (!modeloValido)
+                return BadRequest("Modelo inválido.");
+
+            existing.AtualizarDados(moto.Placa, modeloParsed, moto.Status, condicao);
 
             _repository.Update(existing);
             await _context.SaveChangesAsync();
@@ -94,19 +91,18 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             return NoContent();
         }
 
-            /// <summary>
-            /// Exclui uma moto pelo ID.
-            /// </summary>
-            [HttpDelete("{id}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> DeleteMoto(Guid id)
         {
-            Moto moto = await _repository.GetByIdAsync(id);
+            var moto = await _repository.GetByIdAsync(id);
             if (moto == null)
                 return NotFound();
 
             _repository.Delete(moto);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
     }

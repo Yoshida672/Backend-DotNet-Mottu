@@ -48,11 +48,13 @@ namespace CP2_BackEndMottu_DotNet
 
             builder.Services.AddScoped<IRepository<Moto>, Repository<Moto>>();
             builder.Services.AddScoped<IRepository<LocalizacaoUWB>, Repository<LocalizacaoUWB>>();
+            builder.Services.AddScoped<IRepository<Condicao>, Repository<Condicao>>();
             builder.Services.AddScoped<CreateMotoRequestValidator>();
             builder.Services.AddScoped<CreateLocalizacaoRequestValidator>();
+            builder.Services.AddScoped<CreateCondicaoRequestValidator>();
             builder.Services.AddScoped<MotoUseCase>();
             builder.Services.AddScoped<LocalizacaoUseCase>();
-
+            builder.Services.AddScoped<CondicaoUseCase>();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())

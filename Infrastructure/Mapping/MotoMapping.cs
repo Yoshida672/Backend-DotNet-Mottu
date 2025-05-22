@@ -1,6 +1,6 @@
 ﻿using CP2_BackEndMottu_DotNet.Domain.Entity;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CP2_BackEndMottu_DotNet.Infrastructure.Mapping
 {
@@ -18,6 +18,7 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Mapping
 
             builder.Property(m => m.Modelo)
                 .IsRequired()
+                .HasConversion<string>() // Enum armazenado como string
                 .HasMaxLength(50);
 
             builder.Property(m => m.Status)
@@ -27,6 +28,11 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Mapping
             builder.HasMany(m => m.Localizacoes)
                    .WithOne(l => l.Moto)
                    .HasForeignKey(l => l.MotoId);
+
+            builder.HasOne(m => m.Condicao)
+                   .WithMany()
+                   .HasForeignKey(m => m.CondicaoId)
+                   .IsRequired();
         }
     }
 }
