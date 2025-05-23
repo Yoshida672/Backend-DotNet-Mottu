@@ -22,9 +22,7 @@ public class LocalizacaoUWB
 
     public void AtualizarCoordenadas(double x, double y)
     {
-        if (x < 0 || y < 0)
-            throw new ArgumentException("Coordenadas inválidas");
-
+        
         CoordenadaX = x;
         CoordenadaY = y;
         DataHora = DateTime.UtcNow;
