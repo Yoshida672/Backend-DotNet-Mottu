@@ -57,6 +57,26 @@ namespace CP2_BackEndMottu_DotNet.Application.UseCases
             };
         }
 
-       
+        public async Task<LocalizacaoUWB?> UpdateAsync(Guid id, UpdateLocalizacaoRequest request)
+        {
+            var localizacao = await _repository.GetByIdAsync(id);
+            if (localizacao == null)
+                return null;
+            localizacao.AtualizarCoordenadas(request.CoordenadaX, request.CoordenadaY);
+            localizacao.AtualizarMotoId( request.MotoId);
+
+            await _repository.UpdateAsync(localizacao);
+            return localizacao;
+        }
+
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var localizacao = await _repository.GetByIdAsync(id);
+            if (localizacao == null)
+                return false;
+
+            await _repository.DeleteAsync(localizacao);
+            return true;
+        }
     }
 }

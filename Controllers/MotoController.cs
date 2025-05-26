@@ -63,32 +63,23 @@ namespace CP2_BackEndMottu_DotNet.Controllers
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(MotoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> PutMoto(Guid id, UpdateMotoRequest moto)
         {
-            if (id != moto.Id)
-                return BadRequest("Id inválido.");
+            try
+            {
+                var updated = await _useCase.UpdateAsync(id, moto);
+                if (updated == null)
+                    return NotFound();
 
-            var existing = await _repository.GetByIdAsync(id);
-            if (existing == null)
-                return NotFound();
-
-            var condicao = await _context.Condicoes.FindAsync(moto.CondicaoId);
-            if (condicao == null)
-                return BadRequest("Condição inválida.");
-
-            var modeloValido = Enum.TryParse<Modelo>(moto.Modelo, out var modeloParsed);
-            if (!modeloValido)
-                return BadRequest("Modelo inválido.");
-
-            existing.AtualizarDados(moto.Placa, modeloParsed, moto.Status, condicao);
-
-            _repository.Update(existing);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                return Ok(updated);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
@@ -96,14 +87,12 @@ namespace CP2_BackEndMottu_DotNet.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> DeleteMoto(Guid id)
         {
-            var moto = await _repository.GetByIdAsync(id);
-            if (moto == null)
+            var deleted = await _useCase.DeleteAsync(id);
+            if (!deleted)
                 return NotFound();
-
-            _repository.Delete(moto);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
     }
 }

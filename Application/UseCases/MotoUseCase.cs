@@ -76,5 +76,49 @@ namespace CP2_BackEndMottu_DotNet.Application.UseCases
                 CondicaoId = moto.CondicaoId,
             };
         }
+        public async Task<MotoResponse?> UpdateAsync(Guid id, UpdateMotoRequest request)
+        {
+            var moto = await _context.Motos
+                .Include(m => m.Condicao)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (moto == null)
+                return null;
+
+            var condicao = await _context.Condicoes.FindAsync(request.CondicaoId);
+            if (condicao == null)
+                throw new ArgumentException("Condição não encontrada");
+
+            var modeloValido = Enum.TryParse<Modelo>(request.Modelo, out var modeloParsed);
+            if (!modeloValido)
+                throw new ArgumentException("Modelo inválido");
+
+            moto.AtualizarDados(request.Placa, modeloParsed, request.Status, condicao);
+
+            _context.Motos.Update(moto);
+            await _context.SaveChangesAsync();
+
+            return new MotoResponse
+            {
+                Id = moto.Id,
+                Placa = moto.Placa,
+                Modelo = moto.Modelo.ToString(),
+                Status = moto.Status,
+                CondicaoId = moto.CondicaoId
+            };
+        }
+
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var moto = await _context.Motos.FindAsync(id);
+            if (moto == null)
+                return false;
+
+            _context.Motos.Remove(moto);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
+
 }

@@ -27,4 +27,7 @@ public class LocalizacaoUWB
         CoordenadaY = y;
         DataHora = DateTime.UtcNow;
     }
+    public void AtualizarMotoId(Guid MotoId) {
+        this.MotoId = MotoId;
+    }
 }

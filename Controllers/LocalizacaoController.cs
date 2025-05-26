@@ -70,25 +70,20 @@ namespace CP2_BackEndMottu_DotNet.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
-
         /// <summary>
         /// Atualiza uma localização UWB
         /// </summary>
         [HttpPut("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Put(Guid id, LocalizacaoUWB localizacao)
+        public async Task<IActionResult> Put(Guid id, UpdateLocalizacaoRequest request)
         {
-            if (id != localizacao.Id)
-                return BadRequest();
-
-            var existing = await _repository.GetByIdAsync(id);
-            if (existing == null)
+            var updated = await _useCase.UpdateAsync(id, request);
+            if (updated == null)
                 return NotFound();
 
-            _repository.Update(localizacao);
-            return NoContent();
+            return Ok(updated);
         }
 
         /// <summary>
@@ -99,11 +94,10 @@ namespace CP2_BackEndMottu_DotNet.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var localizacao = await _repository.GetByIdAsync(id);
-            if (localizacao == null)
+            var deleted = await _useCase.DeleteAsync(id);
+            if (!deleted)
                 return NotFound();
 
-            _repository.Delete(localizacao);
             return NoContent();
         }
     }
