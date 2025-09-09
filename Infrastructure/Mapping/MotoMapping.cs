@@ -18,7 +18,7 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Mapping
 
             builder.Property(m => m.Modelo)
                 .IsRequired()
-                .HasConversion<string>() // Enum armazenado como string
+                .HasConversion<string>() 
                 .HasMaxLength(50);
 
             builder.Property(m => m.Status)

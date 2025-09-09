@@ -10,7 +10,7 @@ namespace CP2_BackEndMottu_DotNet.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Tags("CRUD Localização UWB")]
+    [Tags("Localização UWB")]
     public class LocalizacaoController : ControllerBase
     {
         private readonly IUseCase<LocalizacaoUWB, CreateLocalizacaoUwb, UpdateLocalizacaoRequest, LocalizacaoResponse> _useCase;
@@ -24,6 +24,10 @@ namespace CP2_BackEndMottu_DotNet.Api.Controllers
             _validator = validator;
         }
 
+        /// <summary>
+        /// Retorna todas as localizações cadastradas.
+        /// </summary>
+        /// <returns>Lista de LocalizacaoResponse</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<LocalizacaoResponse>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<LocalizacaoResponse>>> GetAll()
@@ -32,6 +36,11 @@ namespace CP2_BackEndMottu_DotNet.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retorna uma localização pelo seu Id.
+        /// </summary>
+        /// <param name="id">Id da localização</param>
+        /// <returns>Objeto LocalizacaoResponse</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -43,6 +52,11 @@ namespace CP2_BackEndMottu_DotNet.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Cria uma nova localização.
+        /// </summary>
+        /// <param name="request">Objeto CreateLocalizacaoUwb com os dados da localização</param>
+        /// <returns>Objeto LocalizacaoResponse criado</returns>
         [HttpPost]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -53,6 +67,12 @@ namespace CP2_BackEndMottu_DotNet.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
 
+        /// <summary>
+        /// Atualiza uma localização existente.
+        /// </summary>
+        /// <param name="id">Id da localização</param>
+        /// <param name="request">Objeto UpdateLocalizacaoRequest com os dados atualizados</param>
+        /// <returns>Objeto LocalizacaoResponse atualizado</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -65,6 +85,10 @@ namespace CP2_BackEndMottu_DotNet.Api.Controllers
             return Ok(updated);
         }
 
+        /// <summary>
+        /// Remove uma localização pelo Id.
+        /// </summary>
+        /// <param name="id">Id da localização</param>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]

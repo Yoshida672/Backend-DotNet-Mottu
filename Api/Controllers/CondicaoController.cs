@@ -1,6 +1,5 @@
 ﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
 using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
-using CP2_BackEndMottu_DotNet.Application.UseCases;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
 using CP2_BackEndMottu_DotNet.Domain.Interface;
 using FluentValidation;
@@ -14,15 +13,18 @@ public class CondicaoController : ControllerBase
     private readonly IValidator<CreateCondicaoRequest> _validator;
 
     public CondicaoController(
-
-    IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse> useCase,
-    IValidator<CreateCondicaoRequest> validator
-        )
-        {
-         _useCase = useCase;
+        IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse> useCase,
+        IValidator<CreateCondicaoRequest> validator
+    )
+    {
+        _useCase = useCase;
         _validator = validator;
     }
 
+    /// <summary>
+    /// Retorna todas as condições registradas.
+    /// </summary>
+    /// <returns>Lista de CondicaoResponse</returns>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -30,6 +32,11 @@ public class CondicaoController : ControllerBase
         return Ok(condicoes);
     }
 
+    /// <summary>
+    /// Retorna uma condição específica pelo ID.
+    /// </summary>
+    /// <param name="id">ID da condição</param>
+    /// <returns>Objeto CondicaoResponse correspondente</returns>
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -38,6 +45,11 @@ public class CondicaoController : ControllerBase
         return Ok(condicao);
     }
 
+    /// <summary>
+    /// Cria uma nova condição.
+    /// </summary>
+    /// <param name="request">Dados para criação da condição</param>
+    /// <returns>Objeto CondicaoResponse criado</returns>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCondicaoRequest request)
     {
@@ -45,6 +57,12 @@ public class CondicaoController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
+    /// <summary>
+    /// Atualiza uma condição existente pelo ID.
+    /// </summary>
+    /// <param name="id">ID da condição a ser atualizada</param>
+    /// <param name="request">Dados atualizados da condição</param>
+    /// <returns>Objeto CondicaoResponse atualizado</returns>
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCondicaoRequest request)
     {
@@ -53,6 +71,11 @@ public class CondicaoController : ControllerBase
         return Ok(updated);
     }
 
+    /// <summary>
+    /// Exclui uma condição pelo ID.
+    /// </summary>
+    /// <param name="id">ID da condição a ser excluída</param>
+    /// <returns>Status da operação</returns>
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
