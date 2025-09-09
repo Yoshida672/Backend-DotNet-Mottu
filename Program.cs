@@ -1,10 +1,15 @@
 using System.Reflection;
+using CP2_BackEndMottu_DotNet.Api.Validators;
+using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
+using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
 using CP2_BackEndMottu_DotNet.Domain.Interface;
 using CP2_BackEndMottu_DotNet.Infrastructure.Context;
 using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace CP2_BackEndMottu_DotNet
 {
@@ -14,22 +19,27 @@ namespace CP2_BackEndMottu_DotNet
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var configuration = builder.Configuration;
-            var dbUser = Environment.GetEnvironmentVariable("DB_USER");
-            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-            var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-            var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
-            var dbSid = Environment.GetEnvironmentVariable("DB_SID");
-
-            var connectionString = $"Data Source={dbHost}:{dbPort}/{dbSid};User ID={dbUser};Password={dbPassword};";
+            builder.Services.AddControllers()
+                .AddFluentValidation(fv =>
+                {
+                    fv.RegisterValidatorsFromAssemblyContaining<CreateCondicaoRequestValidator>();
+                });
 
             builder.Services.AddDbContext<Context>(options =>
-       options.UseOracle(connectionString));
+            {
+                options.UseOracle(builder.Configuration.GetConnectionString("OracleMoto"))
+                .UseLazyLoadingProxies();
+            });
 
 
-   
-            builder.Services.AddControllers();
 
+            builder.Services.AddScoped<IRepository<Moto>, Repository<Moto>>();
+            builder.Services.AddScoped<IRepository<LocalizacaoUWB>, Repository<LocalizacaoUWB>>();
+            builder.Services.AddScoped<IRepository<Condicao>, Repository<Condicao>>();
+
+            builder.Services.AddScoped<
+                IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse>,
+                CondicaoUseCase>();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(swagger =>
@@ -44,11 +54,6 @@ namespace CP2_BackEndMottu_DotNet
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 swagger.IncludeXmlComments(xmlPath);
             });
-
-
-            builder.Services.AddScoped<IRepository<Moto>, Repository<Moto>>();
-            builder.Services.AddScoped<IRepository<LocalizacaoUWB>, Repository<LocalizacaoUWB>>();
-            builder.Services.AddScoped<IRepository<Condicao>, Repository<Condicao>>();
 
             var app = builder.Build();
 
