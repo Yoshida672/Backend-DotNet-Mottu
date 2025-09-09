@@ -1,6 +1,6 @@
 ﻿using CP2_BackEndMottu_DotNet.Domain.Entity;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CP2_BackEndMottu_DotNet.Infrastructure.Mapping
 {
@@ -20,15 +20,18 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Mapping
                 .IsRequired()
                 .HasColumnName("MOTO_ID");
 
-            builder.Property(l => l.CoordenadaX)
-                .IsRequired()
-                .HasColumnType("NUMBER(10,6)") 
-                .HasColumnName("LATITUDE");
+            builder.OwnsOne(l => l.Coordenada, c =>
+            {
+                c.Property(p => p.X)
+                    .HasColumnName("LATITUDE")
+                    .HasColumnType("NUMBER(10,6)")
+                    .IsRequired();
 
-            builder.Property(l => l.CoordenadaY)
-                .IsRequired()
-                .HasColumnType("NUMBER(10,6)")
-                .HasColumnName("LONGITUDE");
+                c.Property(p => p.Y)
+                    .HasColumnName("LONGITUDE")
+                    .HasColumnType("NUMBER(10,6)")
+                    .IsRequired();
+            });
 
             builder.Property(l => l.DataHora)
                 .IsRequired()

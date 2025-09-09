@@ -1,5 +1,6 @@
 using System.Reflection;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
+using CP2_BackEndMottu_DotNet.Domain.Interface;
 using CP2_BackEndMottu_DotNet.Infrastructure.Context;
 using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,6 @@ namespace CP2_BackEndMottu_DotNet
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Configuração do Oracle
             var configuration = builder.Configuration;
             var dbUser = Environment.GetEnvironmentVariable("DB_USER");
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
@@ -27,10 +27,10 @@ namespace CP2_BackEndMottu_DotNet
        options.UseOracle(connectionString));
 
 
-            // Controllers
+   
             builder.Services.AddControllers();
 
-            // Swagger
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(swagger =>
             {
@@ -45,7 +45,7 @@ namespace CP2_BackEndMottu_DotNet
                 swagger.IncludeXmlComments(xmlPath);
             });
 
-            // Repositórios genéricos (DIP)
+
             builder.Services.AddScoped<IRepository<Moto>, Repository<Moto>>();
             builder.Services.AddScoped<IRepository<LocalizacaoUWB>, Repository<LocalizacaoUWB>>();
             builder.Services.AddScoped<IRepository<Condicao>, Repository<Condicao>>();

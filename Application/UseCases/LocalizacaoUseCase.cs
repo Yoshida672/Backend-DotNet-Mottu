@@ -1,12 +1,10 @@
-﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
-using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
+﻿
 using CP2_BackEndMottu_DotNet.Domain.Entity;
 using CP2_BackEndMottu_DotNet.Domain.Interface;
-using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
 
 namespace CP2_BackEndMottu_DotNet.Application.UseCases
 {
-    public class LocalizacaoUseCase : IUseCase<LocalizacaoUWB, CreateLocalizacaoUwb, UpdateLocalizacaoRequest, LocalizacaoResponse>
+    public class LocalizacaoUseCase : ILocalizacaoUseCase
     {
         private readonly IRepository<LocalizacaoUWB> _repository;
 
@@ -15,76 +13,31 @@ namespace CP2_BackEndMottu_DotNet.Application.UseCases
             _repository = repository;
         }
 
-        public async Task<IEnumerable<LocalizacaoResponse>> GetAllAsync()
+        public async Task<IEnumerable<LocalizacaoUWB>> GetAllAsync() =>
+            await _repository.GetAllAsync();
+
+        public async Task<LocalizacaoUWB?> GetByIdAsync(Guid id) =>
+            await _repository.GetByIdAsync(id);
+
+        public async Task<LocalizacaoUWB> CreateAsync(Guid motoId, double x, double y)
         {
-            var localizacoes = await _repository.GetAllAsync();
-            return localizacoes.Select(x => new LocalizacaoResponse
-            {
-                Id = x.Id,
-                CoordenadaX = x.CoordenadaX,
-                CoordenadaY = x.CoordenadaY,
-                DataHora = x.DataHora,
-                MotoId = x.MotoId
-            });
+            var localizacao = new LocalizacaoUWB(x, y, motoId);
+            await _repository.AddAsync(localizacao);
+            return localizacao;
         }
 
-        public async Task<LocalizacaoResponse?> GetByIdAsync(Guid id)
-        {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) return null;
-
-            return new LocalizacaoResponse
-            {
-                Id = entity.Id,
-                CoordenadaX = entity.CoordenadaX,
-                CoordenadaY = entity.CoordenadaY,
-                DataHora = entity.DataHora,
-                MotoId = entity.MotoId
-            };
-        }
-
-        public async Task<LocalizacaoResponse> CreateAsync(CreateLocalizacaoUwb request)
-        {
-            var nova = new LocalizacaoUWB(request.CoordenadaX, request.CoordenadaY, request.MotoId);
-            await _repository.AddAsync(nova);
-
-            return new LocalizacaoResponse
-            {
-                Id = nova.Id,
-                CoordenadaX = nova.CoordenadaX,
-                CoordenadaY = nova.CoordenadaY,
-                DataHora = nova.DataHora,
-                MotoId = nova.MotoId
-            };
-        }
-
-        public async Task<LocalizacaoResponse?> UpdateAsync(Guid id, UpdateLocalizacaoRequest request)
+        public async Task<LocalizacaoUWB?> UpdateAsync(Guid id, double x, double y)
         {
             var localizacao = await _repository.GetByIdAsync(id);
             if (localizacao == null) return null;
 
-            localizacao.AtualizarCoordenadas(request.CoordenadaX, request.CoordenadaY);
-            localizacao.AtualizarMotoId(request.MotoId);
-
+            localizacao.AtualizarCoordenadas(x, y);
             await _repository.UpdateAsync(localizacao);
-
-            return new LocalizacaoResponse
-            {
-                Id = localizacao.Id,
-                CoordenadaX = localizacao.CoordenadaX,
-                CoordenadaY = localizacao.CoordenadaY,
-                DataHora = localizacao.DataHora,
-                MotoId = localizacao.MotoId
-            };
+            return localizacao;
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
-        {
-            var localizacao = await _repository.GetByIdAsync(id);
-            if (localizacao == null) return false;
-
-            await _repository.DeleteAsync(localizacao);
-            return true;
-        }
+        public async Task<bool> DeleteAsync(Guid id) =>
+            await _repository.DeleteAsync(id);
     }
+
 }

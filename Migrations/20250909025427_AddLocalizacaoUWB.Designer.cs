@@ -3,6 +3,7 @@ using System;
 using CP2_BackEndMottu_DotNet.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 
@@ -11,9 +12,11 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace CP2_BackEndMottu_DotNet.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class MotoContextModelSnapshot : ModelSnapshot
+    [Migration("20250909025427_AddLocalizacaoUWB")]
+    partial class AddLocalizacaoUWB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,14 +52,6 @@ namespace CP2_BackEndMottu_DotNet.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
-
-                    b.Property<decimal>("CoordenadaX")
-                        .HasColumnType("NUMBER(10,6)")
-                        .HasColumnName("LATITUDE");
-
-                    b.Property<decimal>("CoordenadaY")
-                        .HasColumnType("NUMBER(10,6)")
-                        .HasColumnName("LONGITUDE");
 
                     b.Property<DateTime>("DataHora")
                         .HasColumnType("TIMESTAMP")
@@ -110,6 +105,30 @@ namespace CP2_BackEndMottu_DotNet.Migrations
                         .WithMany("Localizacoes")
                         .HasForeignKey("MotoId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("CP2_BackEndMottu_DotNet.Domain.Entity.Coordenada", "Coordenada", b1 =>
+                        {
+                            b1.Property<Guid>("LocalizacaoUWBId")
+                                .HasColumnType("RAW(16)");
+
+                            b1.Property<decimal>("X")
+                                .HasColumnType("NUMBER(10,6)")
+                                .HasColumnName("LATITUDE");
+
+                            b1.Property<decimal>("Y")
+                                .HasColumnType("NUMBER(10,6)")
+                                .HasColumnName("LONGITUDE");
+
+                            b1.HasKey("LocalizacaoUWBId");
+
+                            b1.ToTable("Localizacoes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("LocalizacaoUWBId");
+                        });
+
+                    b.Navigation("Coordenada")
                         .IsRequired();
 
                     b.Navigation("Moto");

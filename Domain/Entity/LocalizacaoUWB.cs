@@ -3,31 +3,29 @@
 public class LocalizacaoUWB
 {
     public Guid Id { get; private set; }
-    public double CoordenadaX { get; private set; }
-    public double CoordenadaY { get; private set; }
+    public Coordenada Coordenada { get; private set; } 
     public DateTime DataHora { get; private set; }
 
     public Guid MotoId { get; private set; }
     public virtual Moto Moto { get; private set; }
-    public LocalizacaoUWB() { }
 
+    public LocalizacaoUWB() { }
 
     public LocalizacaoUWB(double x, double y, Guid motoId)
     {
         Id = Guid.NewGuid();
         AtualizarCoordenadas(x, y);
-        DataHora = DateTime.UtcNow;
         MotoId = motoId;
     }
 
     public void AtualizarCoordenadas(double x, double y)
     {
-        
-        CoordenadaX = x;
-        CoordenadaY = y;
+        Coordenada = new Coordenada(x, y); 
         DataHora = DateTime.UtcNow;
     }
-    public void AtualizarMotoId(Guid MotoId) {
-        this.MotoId = MotoId;
+
+    public void AtualizarMotoId(Guid motoId)
+    {
+        MotoId = motoId;
     }
 }

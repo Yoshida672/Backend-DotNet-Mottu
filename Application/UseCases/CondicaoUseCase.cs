@@ -1,14 +1,13 @@
-﻿    using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
-    using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
-    using CP2_BackEndMottu_DotNet.Domain.Entity;
-    using CP2_BackEndMottu_DotNet.Domain.Interface;
-    using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
+﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
+using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
+using CP2_BackEndMottu_DotNet.Domain.Entity;
+using CP2_BackEndMottu_DotNet.Domain.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-    public class CondicaoUseCase : IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse>
+public class CondicaoUseCase : IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse>
     {
         private readonly IRepository<Condicao> _repository;
 

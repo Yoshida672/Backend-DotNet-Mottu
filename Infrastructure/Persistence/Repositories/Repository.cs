@@ -1,4 +1,5 @@
-﻿using CP2_BackEndMottu_DotNet.Infrastructure.Context;
+﻿using CP2_BackEndMottu_DotNet.Domain.Interface;
+using CP2_BackEndMottu_DotNet.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories
@@ -52,5 +53,9 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories
             _context.SaveChanges();
         }
 
+        public Task<bool> DeleteAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

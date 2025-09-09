@@ -1,6 +1,6 @@
 ﻿using CP2_BackEndMottu_DotNet.Domain.Entity;
 
-namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories
+namespace CP2_BackEndMottu_DotNet.Domain.Interface
 {
     public interface IRepository<T>
     {
@@ -14,8 +14,6 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories
         void Update(T entity);
 
         void Delete(T entity);
-
-
-
+        Task<bool> DeleteAsync(Guid id);
     }
 }
