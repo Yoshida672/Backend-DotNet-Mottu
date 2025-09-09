@@ -1,7 +1,4 @@
-
 using System.Reflection;
-using CP2_BackEndMottu_DotNet.Application.UseCases;
-using CP2_BackEndMottu_DotNet.Application.Validators;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
 using CP2_BackEndMottu_DotNet.Infrastructure.Context;
 using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
@@ -16,22 +13,24 @@ namespace CP2_BackEndMottu_DotNet
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Configuração do Oracle
             var configuration = builder.Configuration;
+            var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+            var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+            var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
+            var dbSid = Environment.GetEnvironmentVariable("DB_SID");
 
-            var rawConnection = configuration.GetConnectionString("OracleMoto");
-            var user = Environment.GetEnvironmentVariable("DB_USER");
-            var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
+            var connectionString = $"Data Source={dbHost}:{dbPort}/{dbSid};User ID={dbUser};Password={dbPassword};";
 
-            var connectionString = rawConnection
-                .Replace("${DB_USER}", user)
-                .Replace("${DB_PASSWORD}", password);
+            builder.Services.AddDbContext<Context>(options =>
+       options.UseOracle(connectionString));
 
 
-            builder.Services.AddDbContext<MotoContext>(options =>
-                options.UseOracle(connectionString));
-
+            // Controllers
             builder.Services.AddControllers();
 
+            // Swagger
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(swagger =>
             {
@@ -46,15 +45,11 @@ namespace CP2_BackEndMottu_DotNet
                 swagger.IncludeXmlComments(xmlPath);
             });
 
+            // Repositórios genéricos (DIP)
             builder.Services.AddScoped<IRepository<Moto>, Repository<Moto>>();
             builder.Services.AddScoped<IRepository<LocalizacaoUWB>, Repository<LocalizacaoUWB>>();
             builder.Services.AddScoped<IRepository<Condicao>, Repository<Condicao>>();
-            builder.Services.AddScoped<CreateMotoRequestValidator>();
-            builder.Services.AddScoped<CreateLocalizacaoRequestValidator>();
-            builder.Services.AddScoped<CreateCondicaoRequestValidator>();
-            builder.Services.AddScoped<MotoUseCase>();
-            builder.Services.AddScoped<LocalizacaoUseCase>();
-            builder.Services.AddScoped<CondicaoUseCase>();
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())

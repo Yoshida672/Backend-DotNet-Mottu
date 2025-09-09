@@ -3,35 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
 using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
-using CP2_BackEndMottu_DotNet.Application.UseCases;
-using CP2_BackEndMottu_DotNet.Application.Validators;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
-using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
+using CP2_BackEndMottu_DotNet.Domain.Interface;
 
-namespace CP2_BackEndMottu_DotNet.Controllers
+namespace CP2_BackEndMottu_DotNet.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Tags("CRUD Localização UWB")]
     public class LocalizacaoController : ControllerBase
     {
-        private readonly IRepository<LocalizacaoUWB> _repository;
-        private readonly LocalizacaoUseCase _useCase;
-        private readonly CreateLocalizacaoRequestValidator _validator;
+        private readonly IUseCase<LocalizacaoUWB, CreateLocalizacaoUwb, UpdateLocalizacaoRequest, LocalizacaoResponse> _useCase;
+        private readonly IValidator<CreateLocalizacaoUwb> _validator;
 
         public LocalizacaoController(
-            IRepository<LocalizacaoUWB> repository,
-            LocalizacaoUseCase useCase,
-            CreateLocalizacaoRequestValidator validator)
+            IUseCase<LocalizacaoUWB, CreateLocalizacaoUwb, UpdateLocalizacaoRequest, LocalizacaoResponse> useCase,
+            IValidator<CreateLocalizacaoUwb> validator)
         {
-            _repository = repository;
             _useCase = useCase;
             _validator = validator;
         }
 
-        /// <summary>
-        /// Lista todas as localizações UWB
-        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<LocalizacaoResponse>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<LocalizacaoResponse>>> GetAll()
@@ -40,39 +32,27 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Retorna uma localização UWB específica pelo ID
-        /// </summary>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult<LocalizacaoResponse>> GetById(Guid id)
         {
             var result = await _useCase.GetByIdAsync(id);
-
             if (result == null)
                 return NotFound();
-
             return Ok(result);
         }
 
-        /// <summary>
-        /// Cadastra uma nova localização UWB
-        /// </summary>
         [HttpPost]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<LocalizacaoResponse>> Post(CreateLocalizacaoUwb request)
         {
             _validator.ValidateAndThrow(request);
-
             var response = await _useCase.CreateAsync(request);
-
             return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
-        /// <summary>
-        /// Atualiza uma localização UWB
-        /// </summary>
+
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -82,13 +62,9 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             var updated = await _useCase.UpdateAsync(id, request);
             if (updated == null)
                 return NotFound();
-
             return Ok(updated);
         }
 
-        /// <summary>
-        /// Remove uma localização UWB
-        /// </summary>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -97,7 +73,6 @@ namespace CP2_BackEndMottu_DotNet.Controllers
             var deleted = await _useCase.DeleteAsync(id);
             if (!deleted)
                 return NotFound();
-
             return NoContent();
         }
     }

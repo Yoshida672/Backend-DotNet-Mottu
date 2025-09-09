@@ -1,11 +1,12 @@
 ﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
 using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
+using CP2_BackEndMottu_DotNet.Domain.Interface;
 using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
 
 namespace CP2_BackEndMottu_DotNet.Application.UseCases
 {
-    public class LocalizacaoUseCase
+    public class LocalizacaoUseCase : IUseCase<LocalizacaoUWB, CreateLocalizacaoUwb, UpdateLocalizacaoRequest, LocalizacaoResponse>
     {
         private readonly IRepository<LocalizacaoUWB> _repository;
 
@@ -57,23 +58,30 @@ namespace CP2_BackEndMottu_DotNet.Application.UseCases
             };
         }
 
-        public async Task<LocalizacaoUWB?> UpdateAsync(Guid id, UpdateLocalizacaoRequest request)
+        public async Task<LocalizacaoResponse?> UpdateAsync(Guid id, UpdateLocalizacaoRequest request)
         {
             var localizacao = await _repository.GetByIdAsync(id);
-            if (localizacao == null)
-                return null;
+            if (localizacao == null) return null;
+
             localizacao.AtualizarCoordenadas(request.CoordenadaX, request.CoordenadaY);
-            localizacao.AtualizarMotoId( request.MotoId);
+            localizacao.AtualizarMotoId(request.MotoId);
 
             await _repository.UpdateAsync(localizacao);
-            return localizacao;
+
+            return new LocalizacaoResponse
+            {
+                Id = localizacao.Id,
+                CoordenadaX = localizacao.CoordenadaX,
+                CoordenadaY = localizacao.CoordenadaY,
+                DataHora = localizacao.DataHora,
+                MotoId = localizacao.MotoId
+            };
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
             var localizacao = await _repository.GetByIdAsync(id);
-            if (localizacao == null)
-                return false;
+            if (localizacao == null) return false;
 
             await _repository.DeleteAsync(localizacao);
             return true;

@@ -8,7 +8,7 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories
         protected readonly DbContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public Repository(MotoContext context)
+        public Repository(Context.Context context)
         {
             _context = context;
             _dbSet = _context.Set<T>();

@@ -1,11 +1,14 @@
-﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
-using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
-using CP2_BackEndMottu_DotNet.Domain.Entity;
-using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
+﻿    using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
+    using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
+    using CP2_BackEndMottu_DotNet.Domain.Entity;
+    using CP2_BackEndMottu_DotNet.Domain.Interface;
+    using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
-namespace CP2_BackEndMottu_DotNet.Application.UseCases
-{
-    public class CondicaoUseCase
+    public class CondicaoUseCase : IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse>
     {
         private readonly IRepository<Condicao> _repository;
 
@@ -17,24 +20,24 @@ namespace CP2_BackEndMottu_DotNet.Application.UseCases
         public async Task<IEnumerable<CondicaoResponse>> GetAllAsync()
         {
             var condicoes = await _repository.GetAllAsync();
-            return condicoes.Select(x => new CondicaoResponse
+            return condicoes.Select(c => new CondicaoResponse
             {
-                Id = x.Id,
-                Nome = x.Nome,
-                Cor = x.Cor
+                Id = c.Id,
+                Nome = c.Nome,
+                Cor = c.Cor
             });
         }
 
         public async Task<CondicaoResponse?> GetByIdAsync(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) return null;
+            var condicao = await _repository.GetByIdAsync(id);
+            if (condicao == null) return null;
 
             return new CondicaoResponse
             {
-                Id = entity.Id,
-                Nome = entity.Nome,
-                Cor = entity.Cor
+                Id = condicao.Id,
+                Nome = condicao.Nome,
+                Cor = condicao.Cor
             };
         }
 
@@ -49,29 +52,32 @@ namespace CP2_BackEndMottu_DotNet.Application.UseCases
                 Nome = nova.Nome,
                 Cor = nova.Cor
             };
-
         }
-        public async Task<Condicao?> UpdateAsync(Guid id, UpdateCondicaoRequest request)
+
+        public async Task<CondicaoResponse?> UpdateAsync(Guid id, UpdateCondicaoRequest request)
         {
             var condicao = await _repository.GetByIdAsync(id);
-            if (condicao == null)
-                return null;
+            if (condicao == null) return null;
 
             condicao.Nome = request.Nome;
             condicao.Cor = request.Cor;
 
             await _repository.UpdateAsync(condicao);
-            return condicao;
+
+            return new CondicaoResponse
+            {
+                Id = condicao.Id,
+                Nome = condicao.Nome,
+                Cor = condicao.Cor
+            };
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
             var condicao = await _repository.GetByIdAsync(id);
-            if (condicao == null)
-                return false;
+            if (condicao == null) return false;
 
             await _repository.DeleteAsync(condicao);
             return true;
         }
     }
-}

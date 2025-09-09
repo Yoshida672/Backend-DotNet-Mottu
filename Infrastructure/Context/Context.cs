@@ -1,15 +1,13 @@
 ﻿using CP2_BackEndMottu_DotNet.Domain.Entity;
+using CP2_BackEndMottu_DotNet.Domain.Interface;
 using CP2_BackEndMottu_DotNet.Infrastructure.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace CP2_BackEndMottu_DotNet.Infrastructure.Context
 {
-    public class MotoContext : DbContext
+    public class Context : DbContext, IContext
     {
-    
-        public MotoContext(DbContextOptions<MotoContext> options) : base(options)
-        {
-        }
+        public Context(DbContextOptions<Context> options) : base(options) { }
 
         public DbSet<Moto> Motos { get; set; }
         public DbSet<LocalizacaoUWB> Localizacoes { get; set; }
@@ -22,5 +20,4 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new CondicaoMapping());
         }
     }
-
 }

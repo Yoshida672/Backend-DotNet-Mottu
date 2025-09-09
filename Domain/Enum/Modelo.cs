@@ -1,4 +1,4 @@
-﻿namespace CP2_BackEndMottu_DotNet.Domain.Entity
+﻿namespace CP2_BackEndMottu_DotNet.Domain.Enum
 {
     public enum Modelo
     {

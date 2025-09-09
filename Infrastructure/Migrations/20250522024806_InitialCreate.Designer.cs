@@ -11,7 +11,7 @@ using Oracle.EntityFrameworkCore.Metadata;
 
 namespace CP2_BackEndMottu_DotNet.Migrations
 {
-    [DbContext(typeof(MotoContext))]
+    [DbContext(typeof(Context))]
     [Migration("20250522024806_InitialCreate")]
     partial class InitialCreate
     {

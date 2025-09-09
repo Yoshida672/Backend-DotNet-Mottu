@@ -1,4 +1,6 @@
-﻿namespace CP2_BackEndMottu_DotNet.Domain.Entity;
+﻿using CP2_BackEndMottu_DotNet.Domain.Enum;
+
+namespace CP2_BackEndMottu_DotNet.Domain.Entity;
 
 public class Moto
 {

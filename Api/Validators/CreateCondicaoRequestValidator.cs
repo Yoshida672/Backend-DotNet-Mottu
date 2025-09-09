@@ -1,7 +1,7 @@
 ﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
 using FluentValidation;
 
-namespace CP2_BackEndMottu_DotNet.Application.Validators
+namespace CP2_BackEndMottu_DotNet.Api.Validators
 {
     public class CreateCondicaoRequestValidator : AbstractValidator<CreateCondicaoRequest>
     {
