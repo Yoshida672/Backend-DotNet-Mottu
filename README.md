@@ -1,9 +1,17 @@
-# Backend-DotNet-Mottu
+# 🛵 Ping Mottu
 
+## 👨‍💻 Integrantes
+
+- RM558763 - Eric Issamu de Lima Yoshida
+- RM555010 - Gustavo Matias Teixeira
+- RM557515 - Gustavo Monção
+
+---
 ## Descrição
 
 Esta API gerencia entidades do App Mottu, incluindo Condicao, Moto e LocalizacaoUWB.
 Possui validações via FluentValidation e documentação automática com Swagger.
+
 
 ## Tecnologias
 
@@ -16,6 +24,8 @@ Possui validações via FluentValidation e documentação automática com Swagge
 - FluentValidation
 
 - Swagger/OpenAPI
+
+- Hateoas
 
 
 ## Execução
@@ -91,9 +101,6 @@ https://localhost:7172/swagger/index.html
 
 
 
-## INTEGRANTES
 
-558763 - ERIC ISSAMU DE LIMA YOSHIDA
 
-555010 - GUSTAVO MATIAS TEIXEIRA
 
