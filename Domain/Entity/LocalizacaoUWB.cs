@@ -2,6 +2,9 @@
 
 public class LocalizacaoUWB
 {
+    internal double CoordenadaX;
+    internal double CoordenadaY;
+
     public Guid Id { get; private set; }
     public Coordenada Coordenada { get; private set; } 
     public DateTime DataHora { get; private set; }

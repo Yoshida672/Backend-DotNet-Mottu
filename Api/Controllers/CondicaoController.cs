@@ -1,24 +1,34 @@
 ﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
 using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
+using CP2_BackEndMottu_DotNet.Application.UseCases.impl;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
-using CP2_BackEndMottu_DotNet.Domain.Interface;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CondicaoController : ControllerBase
+public class CondicaoController(
+    IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse> useCase,
+    IValidator<CreateCondicaoRequest> validator
+    ) : ControllerBase
 {
-    private readonly IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse> _useCase;
-    private readonly IValidator<CreateCondicaoRequest> _validator;
+    private readonly IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse> _useCase = useCase;
+    private readonly IValidator<CreateCondicaoRequest> _validator = validator;
 
-    public CondicaoController(
-        IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse> useCase,
-        IValidator<CreateCondicaoRequest> validator
-    )
+    /// <summary>
+    /// Retorna as condições com paginação.
+    /// </summary>
+    /// <param name="page">Número da página (padrão: 1)</param>
+    /// <param name="pageSize">Tamanho da página (padrão: 10)</param>
+    /// <returns>Resultado paginado de CondicaoResponse</returns>
+    [HttpGet("paginado")]
+    public async Task<IActionResult> GetPaginated([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        _useCase = useCase;
-        _validator = validator;
+        var resultado = await (_useCase as CondicaoUseCase)?.GetPaginatedAsync(page, pageSize);
+        if (resultado == null)
+            return StatusCode(500, "UseCase não suporta paginação ou não foi convertido corretamente.");
+
+        return Ok(resultado);
     }
 
     /// <summary>

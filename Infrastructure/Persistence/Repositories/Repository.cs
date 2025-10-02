@@ -1,5 +1,6 @@
-﻿using CP2_BackEndMottu_DotNet.Domain.Interface;
+﻿using CP2_BackEndMottu_DotNet.Domain.Entity;
 using CP2_BackEndMottu_DotNet.Infrastructure.Context;
+using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories.impl;
 using Microsoft.EntityFrameworkCore;
 
 namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories
@@ -36,26 +37,31 @@ namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(T entity)
+        public async Task<bool> DeleteAsync(Guid id)
         {
+            var entity = await _dbSet.FindAsync(id);
+            if (entity == null) return false;
+
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
-        }
-        public void Update(T entity)
-        {
-            _dbSet.Update(entity);
-            _context.SaveChanges();
+            return true;
         }
 
-        public void Delete(T entity)
+        public async Task<(IEnumerable<T> Items, int TotalItems)> GetPaginatedAsync(int page, int pageSize)
         {
-            _dbSet.Remove(entity);
-            _context.SaveChanges();
+            var query = _dbSet.AsQueryable();
+
+            var totalItems = await query.CountAsync();
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalItems);
         }
 
-        public Task<bool> DeleteAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+
+
     }
 }

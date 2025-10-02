@@ -1,6 +1,6 @@
 ﻿using CP2_BackEndMottu_DotNet.Domain.Entity;
 
-namespace CP2_BackEndMottu_DotNet.Domain.Interface
+namespace CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories.impl
 {
     public interface IRepository<T>
     {
@@ -10,10 +10,8 @@ namespace CP2_BackEndMottu_DotNet.Domain.Interface
 
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
-        Task DeleteAsync(T entity);
-        void Update(T entity);
-
-        void Delete(T entity);
         Task<bool> DeleteAsync(Guid id);
+        Task<(IEnumerable<T> Items, int TotalItems)> GetPaginatedAsync(int page, int pageSize);
+
     }
 }

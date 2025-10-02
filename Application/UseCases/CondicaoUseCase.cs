@@ -1,11 +1,10 @@
 ﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
 using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
+using CP2_BackEndMottu_DotNet.Application.UseCases.impl;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
-using CP2_BackEndMottu_DotNet.Domain.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using CP2_BackEndMottu_DotNet.Domain.Pagination;
+using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories.impl;
+
 
 public class CondicaoUseCase : IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse>
     {
@@ -16,7 +15,28 @@ public class CondicaoUseCase : IUseCase<Condicao, CreateCondicaoRequest, UpdateC
             _repository = repository;
         }
 
-        public async Task<IEnumerable<CondicaoResponse>> GetAllAsync()
+    public async Task<PaginatedResult<CondicaoResponse>> GetPaginatedAsync(int page, int pageSize)
+    {
+        var (items, totalItems) = await _repository.GetPaginatedAsync(page, pageSize);
+
+        var responseItems = items.Select(c => new CondicaoResponse
+        {
+            Id = c.Id,
+            Nome = c.Nome,
+            Cor = c.Cor
+        }).ToList();
+
+        return new PaginatedResult<CondicaoResponse>
+        {
+            Items = responseItems,
+            TotalItems = totalItems,
+            Page = page,
+            PageSize = pageSize
+        };
+    }
+
+
+    public async Task<IEnumerable<CondicaoResponse>> GetAllAsync()
         {
             var condicoes = await _repository.GetAllAsync();
             return condicoes.Select(c => new CondicaoResponse
@@ -76,7 +96,7 @@ public class CondicaoUseCase : IUseCase<Condicao, CreateCondicaoRequest, UpdateC
             var condicao = await _repository.GetByIdAsync(id);
             if (condicao == null) return false;
 
-            await _repository.DeleteAsync(condicao);
+            await _repository.DeleteAsync(id);
             return true;
         }
     }

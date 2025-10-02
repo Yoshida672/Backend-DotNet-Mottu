@@ -1,103 +1,87 @@
-﻿using FluentValidation;
+﻿using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
+using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
+using CP2_BackEndMottu_DotNet.Application.UseCases;
+using CP2_BackEndMottu_DotNet.Application.UseCases.impl;
+using CP2_BackEndMottu_DotNet.Domain.Entity;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
-using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
-using CP2_BackEndMottu_DotNet.Domain.Entity;
-using CP2_BackEndMottu_DotNet.Domain.Interface;
 
-namespace CP2_BackEndMottu_DotNet.Api.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class LocalizacaoController(
+    ILocalizacaoUseCase useCase,
+    IValidator<CreateLocalizacaoUwb> validator
+) : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Tags("Localização UWB")]
-    public class LocalizacaoController : ControllerBase
+    private readonly ILocalizacaoUseCase _useCase = useCase;
+    private readonly IValidator<CreateLocalizacaoUwb> _validator = validator;
+
+    /// <summary>
+    /// Retorna todas as localizações.
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
     {
-        private readonly IUseCase<LocalizacaoUWB, CreateLocalizacaoUwb, UpdateLocalizacaoRequest, LocalizacaoResponse> _useCase;
-        private readonly IValidator<CreateLocalizacaoUwb> _validator;
+        var result = await _useCase.GetAllAsync();
+        return Ok(result);
+    }
 
-        public LocalizacaoController(
-            IUseCase<LocalizacaoUWB, CreateLocalizacaoUwb, UpdateLocalizacaoRequest, LocalizacaoResponse> useCase,
-            IValidator<CreateLocalizacaoUwb> validator)
-        {
-            _useCase = useCase;
-            _validator = validator;
-        }
+    /// <summary>
+    /// Retorna uma localização pelo Id.
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await _useCase.GetByIdAsync(id);
+        if (result == null) return NotFound("Localização não encontrada.");
+        return Ok(result);
+    }
 
-        /// <summary>
-        /// Retorna todas as localizações cadastradas.
-        /// </summary>
-        /// <returns>Lista de LocalizacaoResponse</returns>
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<LocalizacaoResponse>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<LocalizacaoResponse>>> GetAll()
-        {
-            var result = await _useCase.GetAllAsync();
-            return Ok(result);
-        }
+    /// <summary>
+    /// Cria uma nova localização.
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateLocalizacaoUwb request)
+    {
+        _validator.ValidateAndThrow(request);
+        var response = await _useCase.CreateAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
+    }
 
-        /// <summary>
-        /// Retorna uma localização pelo seu Id.
-        /// </summary>
-        /// <param name="id">Id da localização</param>
-        /// <returns>Objeto LocalizacaoResponse</returns>
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<LocalizacaoResponse>> GetById(Guid id)
-        {
-            var result = await _useCase.GetByIdAsync(id);
-            if (result == null)
-                return NotFound();
-            return Ok(result);
-        }
+    /// <summary>
+    /// Atualiza uma localização existente.
+    /// </summary>
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateLocalizacaoRequest request)
+    {
+        var updated = await _useCase.UpdateAsync(id, request);
+        if (updated == null) return NotFound("Localização não encontrada para atualização.");
+        return Ok(updated);
+    }
 
-        /// <summary>
-        /// Cria uma nova localização.
-        /// </summary>
-        /// <param name="request">Objeto CreateLocalizacaoUwb com os dados da localização</param>
-        /// <returns>Objeto LocalizacaoResponse criado</returns>
-        [HttpPost]
-        [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.Created)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<LocalizacaoResponse>> Post(CreateLocalizacaoUwb request)
-        {
-            _validator.ValidateAndThrow(request);
-            var response = await _useCase.CreateAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
-        }
+    /// <summary>
+    /// Exclui uma localização pelo Id.
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deleted = await _useCase.DeleteAsync(id);
+        if (!deleted) return NotFound("Localização não encontrada para exclusão.");
+        return NoContent();
+    }
 
-        /// <summary>
-        /// Atualiza uma localização existente.
-        /// </summary>
-        /// <param name="id">Id da localização</param>
-        /// <param name="request">Objeto UpdateLocalizacaoRequest com os dados atualizados</param>
-        /// <returns>Objeto LocalizacaoResponse atualizado</returns>
-        [HttpPut("{id}")]
-        [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Put(Guid id, UpdateLocalizacaoRequest request)
-        {
-            var updated = await _useCase.UpdateAsync(id, request);
-            if (updated == null)
-                return NotFound();
-            return Ok(updated);
-        }
+    /// <summary>
+    /// Retorna as localizações com paginação.
+    /// </summary>
+    [HttpGet("paginado")]
+    public async Task<IActionResult> GetPaginated([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        var resultado = await (_useCase as LocalizacaoUseCase)?.GetPaginatedAsync(page, pageSize);
+        if (resultado == null)
+            return StatusCode(500, "UseCase não suporta paginação ou não foi convertido corretamente.");
 
-        /// <summary>
-        /// Remove uma localização pelo Id.
-        /// </summary>
-        /// <param name="id">Id da localização</param>
-        [HttpDelete("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            var deleted = await _useCase.DeleteAsync(id);
-            if (!deleted)
-                return NotFound();
-            return NoContent();
-        }
+        return Ok(resultado);
+
     }
 }

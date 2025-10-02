@@ -1,7 +1,7 @@
 ﻿using CP2_BackEndMottu_DotNet.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 
-namespace CP2_BackEndMottu_DotNet.Domain.Interface
+namespace CP2_BackEndMottu_DotNet.Infrastructure.Context.impl
 {
     public interface IContext
     {

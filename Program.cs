@@ -3,13 +3,15 @@ using CP2_BackEndMottu_DotNet.Api.Validators;
 using CP2_BackEndMottu_DotNet.Application.DTOs.Request;
 using CP2_BackEndMottu_DotNet.Application.DTOs.Response;
 using CP2_BackEndMottu_DotNet.Domain.Entity;
-using CP2_BackEndMottu_DotNet.Domain.Interface;
 using CP2_BackEndMottu_DotNet.Infrastructure.Context;
 using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using CP2_BackEndMottu_DotNet.Application.UseCases.impl;
+using CP2_BackEndMottu_DotNet.Infrastructure.Persistence.Repositories.impl;
+using CP2_BackEndMottu_DotNet.Application.UseCases;
 
 namespace CP2_BackEndMottu_DotNet
 {
@@ -19,12 +21,7 @@ namespace CP2_BackEndMottu_DotNet
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers()
-                .AddFluentValidation(fv =>
-                {
-                    fv.RegisterValidatorsFromAssemblyContaining<CreateCondicaoRequestValidator>();
-                });
-
+        
             builder.Services.AddDbContext<Context>(options =>
             {
                 options.UseOracle(builder.Configuration.GetConnectionString("OracleMoto"))
@@ -40,6 +37,11 @@ namespace CP2_BackEndMottu_DotNet
             builder.Services.AddScoped<
                 IUseCase<Condicao, CreateCondicaoRequest, UpdateCondicaoRequest, CondicaoResponse>,
                 CondicaoUseCase>();
+            builder.Services.AddScoped<
+                IUseCase<Moto, CreateMoto, UpdateMotoRequest, MotoResponse>,
+                MotoUseCase>();
+            builder.Services.AddScoped<ILocalizacaoUseCase, LocalizacaoUseCase>();
+
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(swagger =>
@@ -54,6 +56,11 @@ namespace CP2_BackEndMottu_DotNet
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 swagger.IncludeXmlComments(xmlPath);
             });
+            builder.Services.AddControllers();
+            builder.Services.AddValidatorsFromAssemblyContaining<CreateCondicaoRequestValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<CreateLocalizacaoRequestValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<CreateMotoRequestValidator>();
+
 
             var app = builder.Build();
 
@@ -67,6 +74,7 @@ namespace CP2_BackEndMottu_DotNet
             app.UseAuthorization();
             app.MapControllers();
             app.Run();
+        
         }
     }
 }

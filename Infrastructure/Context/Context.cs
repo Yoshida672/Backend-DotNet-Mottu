@@ -1,5 +1,5 @@
 ﻿using CP2_BackEndMottu_DotNet.Domain.Entity;
-using CP2_BackEndMottu_DotNet.Domain.Interface;
+using CP2_BackEndMottu_DotNet.Infrastructure.Context.impl;
 using CP2_BackEndMottu_DotNet.Infrastructure.Mapping;
 using Microsoft.EntityFrameworkCore;
 
