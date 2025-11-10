@@ -5,6 +5,7 @@ using Backend_Dotnet_Mottu.Application.DTOs.Response;
 using Backend_Dotnet_Mottu.Application.UseCases;
 using Backend_Dotnet_Mottu.Domain.Pagination;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -14,7 +15,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/localizacao")]
     [Tags("Localizacao")]
-
+    [Authorize] 
     public class LocalizacaoControllerV2(
         ILocalizacaoUseCase useCase,
         IValidator<CreateLocalizacaoUwb> validator
@@ -24,6 +25,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
         private readonly IValidator<CreateLocalizacaoUwb> _validator = validator;
 
         [HttpGet]
+        [Authorize] 
         [ProducesResponseType(typeof(IEnumerable<LocalizacaoResponse>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAll()
         {
@@ -32,6 +34,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
         }
 
         [HttpGet("{id:long}")]
+        [Authorize]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetById(long id)
@@ -42,6 +45,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateLocalizacaoUwb request)
@@ -52,6 +56,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
         }
 
         [HttpPut("{id:long}")]
+        [Authorize]
         [ProducesResponseType(typeof(LocalizacaoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Update(long id, [FromBody] UpdateLocalizacaoRequest request)
@@ -62,6 +67,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
         }
 
         [HttpDelete("{id:long}")]
+        [Authorize]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Delete(long id)
@@ -72,6 +78,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
         }
 
         [HttpGet("paginado")]
+        [Authorize]
         [ProducesResponseType(typeof(PaginatedResult<LocalizacaoResponse>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetPaginated([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {

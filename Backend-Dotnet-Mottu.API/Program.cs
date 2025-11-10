@@ -3,6 +3,7 @@ using Backend_Dotnet_Mottu.Application.Configs;
 using Backend_Dotnet_Mottu.Application.DTOs.Request;
 using Backend_Dotnet_Mottu.Application.DTOs.Response;
 using Backend_Dotnet_Mottu.Application.DTOs.Validators;
+using Backend_Dotnet_Mottu.Application.Services;
 using Backend_Dotnet_Mottu.Application.UseCases;
 using Backend_Dotnet_Mottu.Domain.Entities;
 using Backend_Dotnet_Mottu.Extensions;
@@ -66,6 +67,9 @@ public class Program
 
         builder.Services.AddInfrastructure(builder.Configuration);
 
+        builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
+
+        builder.Services.AddScoped<ITokenService, TokenService>();
 
         builder.Services.AddScoped<
             IUseCase<Moto, CreateMoto, UpdateMotoRequest, MotoResponse>,

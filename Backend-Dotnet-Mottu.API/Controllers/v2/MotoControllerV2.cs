@@ -6,6 +6,7 @@ using Backend_Dotnet_Mottu.Application.UseCases;
 using Backend_Dotnet_Mottu.Domain.Entities;
 using Backend_Dotnet_Mottu.Domain.Pagination;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -15,7 +16,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/moto")]
     [Tags("Motos")]
-
+    [Authorize]
     public class MotoControllerV2(
         IUseCase<Moto, CreateMoto, UpdateMotoRequest, MotoResponse> useCase,
         IValidator<CreateMoto> validator) : ControllerBase
@@ -52,6 +53,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
         }
 
         [HttpPut("{id:long}")]
+        [Authorize(Policy = "AdminOnly")] // <-- somente Admin pode atualizar
         [ProducesResponseType(typeof(MotoResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -63,6 +65,7 @@ namespace Backend_Dotnet_Mottu.Controllers.v2
         }
 
         [HttpDelete("{id:long}")]
+        [Authorize(Policy = "AdminOnly")] 
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Delete(long id)
