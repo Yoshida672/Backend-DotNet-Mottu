@@ -45,58 +45,71 @@ Backend-DotNet-Mottu/
 
 ---
 
-## Execução com Docker
 
-1. **Copie o arquivo de ambiente**:
+## Pré-requisitos
 
-```powershell
+* .NET 8 SDK instalado
+* MongoDB instalado e rodando localmente
+* Node.js e npm/yarn (se houver frontend)
+
+---
+
+## Configuração do ambiente
+
+1. **Clone o repositório**
+
+```bash
+git clone <URL_DO_REPOSITORIO>
+cd Backend-Dotnet-Mottu
+```
+
+2. **Copie o arquivo de exemplo do ambiente**
+
+```bash
 cp .env.example .env
 ```
 
-2. **Suba os containers**:
+> Configure as variáveis de ambiente no arquivo `.env` conforme sua máquina.
 
-```powershell
-docker compose up -d --build
+3. **Inicie o MongoDB local**
+
+* Certifique-se de que o MongoDB está rodando.
+* Crie o banco de dados definido no `.env`.
+
+4. **Crie o usuário administrador**
+
+```bash
+mongo <nome_do_banco> ./scripts/01-create-user.js
 ```
 
-* MongoDB e API serão criados automaticamente.
-* Health check disponível em: `http://localhost:5000/health` (ou porta configurada no `.env`).
+> O script adicionará o usuário admin necessário para acessar o sistema.
 
-3. **Logs**:
+---
 
-```powershell
-docker compose logs -f
+## Executando o backend no Visual Studio
+
+1. Abra a solução `Backend-Dotnet-Mottu.sln` no Visual Studio.
+2. Configure o projeto **Backend-Dotnet-Mottu.API** como projeto de inicialização.
+3. Rode o projeto (`F5` ou `Ctrl+F5`).
+4. O Swagger estará disponível em:
+
 ```
-
-4. **Parar containers**:
-
-```powershell
-docker compose down
+http://localhost:<porta>/swagger
 ```
 
 ---
 
-## Execução local (sem Docker)
+## Executando via linha de comando (opcional)
 
-1. Abra o Visual Studio 2022 ou superior.
-2. Abra a solução `Backend-DotNet-Mottu.sln`.
-3. Restaure pacotes NuGet:
-
-```powershell
+```bash
+cd Backend-Dotnet-Mottu.API
 dotnet restore
-```
-
-4. Rode a API:
-
-```powershell
-cd Backend-DotNet-Mottu.API
+dotnet build
 dotnet run
 ```
 
-* Swagger disponível em: `https://localhost:7172/swagger/index.html`
-* Health check: `https://localhost:7172/health`
-
 ---
+
 
 ## Testes Unitários
 
